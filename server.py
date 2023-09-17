@@ -22,7 +22,7 @@ import pandas as pd
 
 IS_MULTI_THREADED = True
 WELL_LOG_DATA_PATH = "archive/well_log.csv"
-MAX_ROWS = 100
+MAX_ROWS = 200
 
 
 class State:
@@ -68,16 +68,18 @@ def perspective_thread(manager):
 
     # update with new data every 50ms
     def updater():
+        # loopback
         if state.idx >= len(state.df):
-            return
-        l = max(state.idx - MAX_ROWS, 0)
+            state.idx = 1
+
         r = state.idx
+        l = max(r - MAX_ROWS, 0)
         data = state.df[l:r]
         table.update(data)
         state.idx += 1
 
     callback = tornado.ioloop.PeriodicCallback(
-        callback=updater, jitter=0.1, callback_time=200
+        callback=updater, jitter=0.1, callback_time=100
     )
     psp_loop = tornado.ioloop.IOLoop()
 

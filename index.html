@@ -46,16 +46,20 @@
   </head>
 
   <body>
-    <perspective-viewer style="height: 50%" id="Density" theme="Pro Dark" />
+    <perspective-viewer
+      style="height: 50%"
+      id="Density_Porosity"
+      theme="Pro Dark"
+    ></perspective-viewer>
     <perspective-viewer
       style="height: 50%; margin-top: 50vh"
       id="Restivity"
       theme="Pro Dark"
-    />
+    ></perspective-viewer>
     <script type="module">
       import perspective from "/node_modules/@finos/perspective/dist/cdn/perspective.js";
       window.addEventListener("DOMContentLoaded", async function () {
-        const Density = document.getElementById("Density");
+        const Density_Porosity = document.getElementById("Density_Porosity");
         const Restivity = document.getElementById("Restivity");
 
         // Create a client that expects a Perspective server to accept
@@ -76,8 +80,8 @@
 
         // Load this in the `<perspective-viewer>`.
         const table = await websocket.open_table("data_source_one");
-        Density.load(table);
-        Density.restore({
+        Density_Porosity.load(table);
+        Density_Porosity.restore({
           plugin: "X/Y Line",
           plugin_config: {},
           settings: true,
@@ -85,7 +89,7 @@
           title: null,
           group_by: [],
           split_by: [],
-          columns: ["T_Offset", "Density", null],
+          columns: ["T_Offset", "Density_Porosity", null],
           filter: [],
           sort: [["T_Offset", "asc"]],
           expressions: [],
