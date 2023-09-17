@@ -17,15 +17,15 @@
 
     <script
       type="module"
-      src="http://localhost:8080/node_modules/@finos/perspective-viewer/dist/cdn/perspective-viewer.js"
+      src="/node_modules/@finos/perspective-viewer/dist/cdn/perspective-viewer.js"
     ></script>
     <script
       type="module"
-      src="http://localhost:8080/node_modules/@finos/perspective-viewer-datagrid/dist/cdn/perspective-viewer-datagrid.js"
+      src="/node_modules/@finos/perspective-viewer-datagrid/dist/cdn/perspective-viewer-datagrid.js"
     ></script>
     <script
       type="module"
-      src="http://localhost:8080/node_modules/@finos/perspective-viewer-d3fc/dist/cdn/perspective-viewer-d3fc.js"
+      src="/node_modules/@finos/perspective-viewer-d3fc/dist/cdn/perspective-viewer-d3fc.js"
     ></script>
 
     <link
@@ -65,7 +65,7 @@
         // Create a client that expects a Perspective server to accept
         // Websocket connections at the specified URL.
         const websocket = perspective.websocket(
-          "ws://localhost:8080/websocket"
+          "ws://hole-dev-stream-xomlbq5lta-uc.a.run.app/websocket"
         );
 
         /* This shows Perspective running in "server mode": the `table`
