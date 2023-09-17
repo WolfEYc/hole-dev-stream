@@ -1,4 +1,4 @@
-,Depth,Gamma-ray,Shale_Volume,Restivity,Delta T,Vp,Vs,Density,Density_Calculated,Neuron_Porosity,Density_Porosity,Possions_Ratio,Classification
+index,Depth,Gamma_ray,Shale_Volume,Restivity,Delta_T,Vp,Vs,Density,Density_Calculated,Neuron_Porosity,Density_Porosity,Possions_Ratio,Classification
 0,4000,73.215,0.7965,0.25,137.81,7256.3675,2799.0029999999997,2.1278,2.1278,-999.25,0.2818,0.4126,0
 1,4001,69.152,0.7391,0.2,138.06,7243.2276,2804.5841,2.1202,2.1202,-999.25,0.2893,0.4118,0
 2,4002,65.965,0.6940000000000001,0.21,138.06,7243.2276,2817.0359999999996,2.1149,2.1149,-999.25,0.2946,0.4109,0

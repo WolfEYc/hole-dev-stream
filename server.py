@@ -9,56 +9,29 @@
 #  ┃ This file is part of the Perspective library, distributed under the terms ┃
 #  ┃ of the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). ┃
 #  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-import random
 import logging
 import threading
+from weakref import ref
 import tornado.websocket
 import tornado.web
 import tornado.ioloop
-from datetime import date, datetime, timedelta
 from perspective import Table, PerspectiveManager, PerspectiveTornadoHandler
 import threading
 import concurrent.futures
-
-
-def data_source(delta: timedelta):
-    rows = []
-    modifier = random.random() * random.randint(1, 50)
-    for i in range(5):
-        rows.append(
-            {
-                "name": SECURITIES[random.randint(0, len(SECURITIES) - 1)],
-                "client": CLIENTS[random.randint(0, len(CLIENTS) - 1)],
-                "open": (random.random() * 75 + random.randint(0, 9)) * modifier,
-                "high": (random.random() * 105 + random.randint(1, 3)) * modifier,
-                "low": (random.random() * 85 + random.randint(1, 3)) * modifier,
-                "close": (random.random() * 90 + random.randint(1, 3)) * modifier,
-                "lastUpdate": datetime.now(),
-                "date": date.today(),
-            }
-        )
-    return rows
-
+import pandas as pd
 
 IS_MULTI_THREADED = True
-SECURITIES = [
-    "AAPL.N",
-    "AMZN.N",
-    "QQQ.N",
-    "NVDA.N",
-    "TSLA.N",
-    "FB.N",
-    "MSFT.N",
-    "TLT.N",
-    "XIV.N",
-    "YY.N",
-    "CSCO.N",
-    "GOOGL.N",
-    "PCLN.N",
-]
+WELL_LOG_DATA_PATH = "archive/well_log.csv"
+MAX_ROWS = 100
 
-CLIENTS = ["Homer", "Marge", "Bart", "Lisa", "Maggie", "Moe", "Lenny", "Carl", "Krusty"]
+
+class State:
+    idx: int
+    df: pd.DataFrame
+
+    def __init__(self, df) -> None:
+        self.idx = 1
+        self.df = df
 
 
 def perspective_thread(manager):
@@ -67,28 +40,45 @@ def perspective_thread(manager):
     in the front-end."""
     table = Table(
         {
-            "name": str,
-            "client": str,
-            "open": float,
-            "high": float,
-            "low": float,
-            "close": float,
-            "lastUpdate": datetime,
-            "date": date,
+            "Depth": int,
+            "Gamma_ray": float,
+            "Shale_Volume": float,
+            "Restivity": float,
+            "Delta_T": float,
+            "T_Offset": float,
+            "Vp": float,
+            "Vs": float,
+            "Density": float,
+            "Density_Calculated": float,
+            "Neuron_Porosity": float,
+            "Density_Porosity": float,
+            "Possions_Ratio": float,
+            "Classification": int,
         },
-        limit=2500,
+        limit=MAX_ROWS,
     )
 
     # Track the table with the name "data_source_one", which will be used in
     # the front-end to access the Table.
     manager.host_table("data_source_one", table)
-    delta = timedelta(milliseconds=500)
+    df = pd.read_csv(WELL_LOG_DATA_PATH)
+    df["Delta_T"] = df["Delta_T"].astype(float)
+    df["T_Offset"] = df["Delta_T"].cumsum()
+    state = State(df)
 
     # update with new data every 50ms
     def updater():
-        table.update(data_source(delta))
+        if state.idx >= len(state.df):
+            return
+        l = max(state.idx - MAX_ROWS, 0)
+        r = state.idx
+        data = state.df[l:r]
+        table.update(data)
+        state.idx += 1
 
-    callback = tornado.ioloop.PeriodicCallback(callback=updater, callback_time=delta)
+    callback = tornado.ioloop.PeriodicCallback(
+        callback=updater, jitter=0.1, callback_time=200
+    )
     psp_loop = tornado.ioloop.IOLoop()
 
     if IS_MULTI_THREADED:
