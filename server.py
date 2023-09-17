@@ -125,7 +125,7 @@ def make_app():
 def main():
     app = make_app()
     app.listen(8080)
-    logging.critical("Listening on http://localhost:8080")
+    logging.critical("Listening on http://127.0.0.1:8080")
     loop = tornado.ioloop.IOLoop.current()
     loop.start()
 
